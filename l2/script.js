@@ -1,7 +1,6 @@
 
 let currentTable = "products";
 
-// Показати записи та рядок для додавання.
 function fillTable(data, title, fields, headers) {
     let container = document.getElementById("table-container");
     container.innerHTML = "<h2></h2><table><thead><tr></tr></thead><tbody></tbody></table>";
@@ -47,7 +46,6 @@ function fillTable(data, title, fields, headers) {
     };
     row.insertCell().appendChild(button);
 }
-//========================================================================
 function showTable(name) {
     currentTable = name;
     document.getElementById("message").textContent = "";

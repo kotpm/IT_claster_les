@@ -1,6 +1,10 @@
 
 function getNextId(data) {
-    return data.length + 1;
+    let maxId = 0;
+    for (let i = 0; i < data.length; i++) {
+        if (data[i].id > maxId) maxId = data[i].id;
+    }
+    return maxId + 1;
 }
 
 
@@ -13,8 +17,8 @@ function findRecord(data, id) {
 
 
 function inputDate(value) {
-  
-    return value.split(".").reverse().join("-");
+    let parts = value.split(".");
+    return parts[2] + "-" + parts[1] + "-" + parts[0];
 }
 
 
@@ -23,12 +27,14 @@ function setInputRules(input, field) {
     if (field == "type" || field == "status") return;
 
     let numbers = ["id", "price", "stock", "warranty", "quantity", "customerId", "productId", "total", "ordersCount"];
-    // includes перевіряє, чи є назва поля в списку числових полів.
-    if (numbers.includes(String(field))) {
-        input.type = "number";
-        input.min = 0;
-        input.step = 1;
-        input.max = Number.MAX_SAFE_INTEGER;
+    for (let i = 0; i < numbers.length; i++) {
+        if (field == numbers[i]) {
+            input.type = "number";
+            input.min = 0;
+            input.step = 1;
+           
+            input.max = Number.MAX_SAFE_INTEGER;
+        }
     }
     if (field == "quantity" || field == "customerId" || field == "productId") input.min = 1;
     if (field == "price" || field == "total") input.step = 0.01;
@@ -70,11 +76,13 @@ function readRecord(row, fields) {
     for (let j = 0; j < fields.length; j++) {
         let input = row.cells[j].firstChild;
         input.value = input.value.trim();
-        // Браузер сам показує помилку біля неправильного поля.
         if (!input.reportValidity()) return null;
         let value = input.value;
         if (input.type == "number") value = Number(value);
-        if (input.type == "date") value = value.split("-").reverse().join(".");
+        if (input.type == "date") {
+            let parts = value.split("-");
+            value = parts[2] + "." + parts[1] + "." + parts[0];
+        }
         record[fields[j]] = value;
     }
     return record;

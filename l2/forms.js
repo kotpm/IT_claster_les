@@ -1,5 +1,4 @@
 
-// Створити поле для введення.
 function createInput(field) {
     let input = document.createElement("input");
     if (field == "type" || field == "status") {
@@ -12,7 +11,6 @@ function createInput(field) {
     return input;
 }
 
-// Додати запис.
 function addRow(row, data, fields) {
     let record = readRecord(row, fields);
     let message = document.getElementById("message");
