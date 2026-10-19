@@ -1,0 +1,67 @@
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+header {
+    color: rgb(11, 11, 11);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+}
+
+main {
+    flex: auto;
+    padding: 20px;
+    min-width: 0;
+}
+
+footer {
+    display: flex;
+    padding: 5px;
+    align-items: center;
+    justify-content: center;
+}
+
+h1 {
+    margin: 0;
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: left;
+}
+
+td input, td select { 
+    box-sizing: border-box; 
+    width: 100%; 
+    min-width: 110px; 
+}
+td input[readonly] { 
+    background: #eee; 
+}
+.new-row { 
+    background: #f0f8ff; 
+}
+.new-row button { 
+    min-width: 36px; 
+    font-size: 20px; 
+}
+#message { 
+    min-height: 1.5em; 
+}

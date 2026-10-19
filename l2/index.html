@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Інтернет-магазин — лабораторна робота №2</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Предметна область — інтернет-магазин</h1>
+        <p>Інформація про товари, покупців і замовлення</p>
+    </header>
+    <main>
+        <button type="button" onclick="showTable('products')">Товари</button>
+        <button type="button" onclick="showTable('customers')">Покупці</button>
+        <button type="button" onclick="showTable('orders')">Замовлення</button>
+        <div id="table-container" class="table-container"></div>
+        <p id="message" role="status" aria-live="polite"></p>
+       
+    </main>
+    <footer>
+        <p>Виконано в рамках другої лабораторної роботи</p>
+    </footer>
+    <script src="data.js"></script>
+    <script src="validation.js"></script>
+    <script src="forms.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
