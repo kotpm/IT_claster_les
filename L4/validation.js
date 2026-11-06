@@ -1,4 +1,43 @@
 
+function checkImport(data) {
+    if (data == null) return false;
+    let tables = [data.products, data.customers, data.orders];
+    let textFields = [
+        ["name", "category", "brand"],
+        ["fullName", "email", "city", "registrationDate", "type"],
+        ["date", "status"]
+    ];
+    let numberFields = [
+        ["id", "price", "stock", "warranty"],
+        ["id", "ordersCount"],
+        ["id", "customerId", "productId", "quantity", "total"]
+    ];
+    for (let i = 0; i < tables.length; i++) {
+        if (!Array.isArray(tables[i])) return false;
+        for (let j = 0; j < tables[i].length; j++) {
+            let record = tables[i][j];
+            if (record == null) return false;
+            for (let k = 0; k < textFields[i].length; k++) {
+                if (typeof record[textFields[i][k]] != "string") return false;
+            }
+            for (let k = 0; k < numberFields[i].length; k++) {
+                let value = record[numberFields[i][k]];
+                if (typeof value != "number" || !Number.isFinite(value) || value < 0) return false;
+            }
+            if (!Number.isSafeInteger(record.id)) return false;
+            for (let k = 0; k < j; k++) {
+                if (tables[i][k].id == record.id) return false;
+            }
+        }
+    }
+    for (let i = 0; i < data.orders.length; i++) {
+        let order = data.orders[i];
+        if (findRecord(data.customers, order.customerId) == null) return false;
+        if (findRecord(data.products, order.productId) == null) return false;
+    }
+    return true;
+}
+
 function getNextId(data) {
     let maxId = 0;
     for (let i = 0; i < data.length; i++) {

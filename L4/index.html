@@ -29,6 +29,14 @@
     </dialog>
     <footer>
         <p>Виконано в рамках четвертої лабораторної роботи</p>
+        <div class="file-actions">
+            <label class="file-button">
+                Імпорт JSON
+                <input type="file" accept=".json" onchange="importData(this)" aria-label="Імпорт JSON">
+            </label>
+            <button class="file-button" type="button" onclick="exportData()">Експорт JSON</button>
+        </div>
+        
     </footer>
     <script src="data.js"></script>
     <script src="validation.js"></script>
