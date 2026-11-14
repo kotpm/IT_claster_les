@@ -38,7 +38,9 @@ function checkImport(data) {
     return true;
 }
 
-function getNextId(data) {
+function getNextId(name) {
+    let data = loadData(name);
+    if (data == null) return null;
     let maxId = 0;
     for (let i = 0; i < data.length; i++) {
         if (data[i].id > maxId) maxId = data[i].id;
@@ -88,19 +90,26 @@ function setInputRules(input, field) {
 }
 
 
-function checkDelete(data, id) {
-    for (let i = 0; i < orders.length; i++) {
-        if (data == products && orders[i].productId == id) {
+function checkDelete(name, id) {
+    let stored = loadData();
+    if (stored == null) return "Не вдалося прочитати дані.";
+    for (let i = 0; i < stored.orders.length; i++) {
+        if (name == "products" && stored.orders[i].productId == id) {
             return "дані використовуються в таблиці «Замовлення».";
         }
-        if (data == customers && orders[i].customerId == id) {
+        if (name == "customers" && stored.orders[i].customerId == id) {
             return "дані використовуються в таблиці «Замовлення».";
         }
     }
     return "";
 }
 
-function checkEdit(data, record, field, value) {
+function checkEdit(name, record, field, value) {
+    let stored = loadData();
+    if (stored == null) return "Не вдалося прочитати дані.";
+    if (["id", "total", "ordersCount"].includes(field) || !(field in record)) {
+        return "Це поле не можна змінювати.";
+    }
     let input = createInput(field);
     input.value = value;
     if (input.type == "date") {
@@ -115,27 +124,29 @@ function checkEdit(data, record, field, value) {
         record[field] = Number(input.value);
     }
 
-    if (data == customers && field == "registrationDate") {
-        for (let i = 0; i < orders.length; i++) {
-            if (orders[i].customerId == record.id && inputDate(orders[i].date) < inputDate(value)) {
+    if (name == "customers" && field == "registrationDate") {
+        for (let i = 0; i < stored.orders.length; i++) {
+            if (stored.orders[i].customerId == record.id && inputDate(stored.orders[i].date) < inputDate(value)) {
                 return "Дата реєстрації не може бути пізнішою за замовлення покупця.";
             }
         }
     }
-    return checkRecord(data, record, record.id);
+    return checkRecord(name, record, record.id);
 }
 
-function checkRecord(data, record, ignoredId) {
-    if (data == customers) {
-        for (let i = 0; i < customers.length; i++) {
-            if (customers[i].id != ignoredId && customers[i].email.toLowerCase() == record.email.toLowerCase()) {
+function checkRecord(name, record, ignoredId) {
+    let stored = loadData();
+    if (stored == null) return "Не вдалося прочитати дані.";
+    if (name == "customers") {
+        for (let i = 0; i < stored.customers.length; i++) {
+            if (stored.customers[i].id != ignoredId && stored.customers[i].email.toLowerCase() == record.email.toLowerCase()) {
                 return "Покупець із такою поштою вже є.";
             }
         }
     }
-    if (data == orders) {
-        let customer = findRecord(customers, record.customerId);
-        let product = findRecord(products, record.productId);
+    if (name == "orders") {
+        let customer = findRecord(stored.customers, record.customerId);
+        let product = findRecord(stored.products, record.productId);
         if (customer == null || product == null) return "Такого ID покупця або товару немає.";
         if (inputDate(record.date) < inputDate(customer.registrationDate)) {
             return "Замовлення не може бути раніше реєстрації покупця.";

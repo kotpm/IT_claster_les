@@ -10,12 +10,10 @@ function createInput(field) {
     if (field == "customerId" || field == "productId") {
         input = document.createElement("select");
         input.add(new Option("Оберіть зі списку", ""));
-        let data = products;
-        let name = "name";
-        if (field == "customerId") {
-            data = customers;
-            name = "fullName";
-        }
+        let table = field == "customerId" ? "customers" : "products";
+        let data = loadData(table);
+        if (data == null) return input;
+        let name = field == "customerId" ? "fullName" : "name";
         for (let i = 0; i < data.length; i++) {
             input.add(new Option(data[i].id + " — " + data[i][name], data[i].id));
         }
@@ -24,7 +22,12 @@ function createInput(field) {
     return input;
 }
 
-function editCell(data, record, field, title) {
+function editCell(name, id, field, title) {
+    let record = loadData(name, id);
+    if (record == null) {
+        alert("Запис недоступний або вже видалений.");
+        return;
+    }
     if (field == "customerId" || field == "productId") {
         let dialog = document.getElementById("edit-dialog");
         let container = document.getElementById("edit-field");
@@ -36,7 +39,7 @@ function editCell(data, record, field, title) {
         document.getElementById("edit-title").textContent = title;
         document.getElementById("edit-form").onsubmit = function (event) {
             event.preventDefault();
-            if (saveEdit(data, record, field, input.value)) dialog.close();
+            if (saveEdit(name, id, field, input.value)) dialog.close();
         };
         dialog.showModal();
         return;
@@ -48,77 +51,5 @@ function editCell(data, record, field, title) {
     let value = prompt("Змінити: " + title + hint, record[field]);
     if (value == null) return;
 
-    saveEdit(data, record, field, value.trim());
-}
-
-function saveEdit(data, record, field, value) {
-    let updated = {};
-    for (let key in record) {
-        updated[key] = record[key];
-    }
-    let error = checkEdit(data, updated, field, value);
-    if (error != "") {
-        alert("Не збережено: " + error);
-        return false;
-    }
-
-    if (data == orders && record.customerId != updated.customerId) {
-        let oldCustomer = findRecord(customers, record.customerId);
-        let newCustomer = findRecord(customers, updated.customerId);
-        oldCustomer.ordersCount--;
-        newCustomer.ordersCount++;
-    }
-    for (let key in updated) {
-        record[key] = updated[key];
-    }
-    let saved = saveData();
-    showTable(currentTable);
-    if (saved) document.getElementById("message").textContent = "Запис змінено.";
-    return true;
-}
-
-function deleteRow(data, id) {
-    let index = -1;
-    for (let i = 0; i < data.length; i++) {
-        if (data[i].id == id) {
-            index = i;
-            break;
-        }
-    }
-    if (index == -1) return;
-
-    let error = checkDelete(data, id);
-    if (error != "") {
-        alert("Неможливо видалити запис: " + error);
-        return;
-    }
-
-    if (data == orders) {
-        let customer = findRecord(customers, data[index].customerId);
-        if (customer != null) customer.ordersCount--;
-    }
-    data.splice(index, 1);
-    let saved = saveData();
-    showTable(currentTable);
-    if (saved) document.getElementById("message").textContent = "Запис видалено.";
-}
-
-function addRow(row, data, fields) {
-    let record = readRecord(row, fields);
-    let message = document.getElementById("message");
-    if (record == null) return;
-    let error = checkRecord(data, record);
-    if (error != "") {
-        message.textContent = "Не збережено: " + error;
-        return;
-    }
-
-    data.push(record);
-    if (data == orders) {
-        let customer = findRecord(customers, record.customerId);
-        customer.ordersCount++;
-    }
-    let saved = saveData();
-    showTable(currentTable);
-    if (saved) message.textContent = "Запис додано.";
+    saveEdit(name, id, field, value.trim());
 }

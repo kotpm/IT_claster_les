@@ -1,7 +1,7 @@
 
 let currentTable = "products";
 
-function fillTable(data, title, fields, headers) {
+function fillTable(name, data, title, fields, headers) {
     let container = document.getElementById("table-container");
     container.innerHTML = "<h2></h2><table><thead><tr></tr></thead><tbody></tbody></table>";
     container.querySelector("h2").textContent = title;
@@ -17,6 +17,7 @@ function fillTable(data, title, fields, headers) {
 
     let body = container.querySelector("tbody");
     for (let i = 0; i < data.length; i++) {
+        let id = data[i].id;
         let row = body.insertRow();
         for (let j = 0; j < fields.length; j++) {
             let field = fields[j];
@@ -25,7 +26,7 @@ function fillTable(data, title, fields, headers) {
             if (field != "id" && field != "total" && field != "ordersCount") {
                 cell.title = "Двічі клацніть, щоб змінити";
                 cell.ondblclick = function () {
-                    editCell(data, data[i], field, headers[j]);
+                    editCell(name, id, field, headers[j]);
                 };
             }
         }
@@ -35,7 +36,7 @@ function fillTable(data, title, fields, headers) {
         deleteButton.className = "delete-button";
         deleteButton.setAttribute("aria-label", "Видалити запис №" + data[i].id);
         deleteButton.onclick = function () {
-            deleteRow(data, data[i].id);
+            deleteRow(name, id);
         };
         row.insertCell().appendChild(deleteButton);
     }
@@ -47,7 +48,7 @@ function fillTable(data, title, fields, headers) {
         let field = fields[j];
         let input = createInput(field);
         input.setAttribute("aria-label", headers[j]);
-        if (field == "id") input.value = getNextId(data);
+        if (field == "id") input.value = getNextId(name);
         if (field == "ordersCount") input.value = 0;
         if (field == "quantity") input.value = 1;
         row.insertCell().appendChild(input);
@@ -57,27 +58,29 @@ function fillTable(data, title, fields, headers) {
     button.textContent = "+";
     button.setAttribute("aria-label", "Додати запис");
     button.onclick = function () {
-        addRow(row, data, fields);
+        addRow(row, name, fields);
     };
     row.insertCell().appendChild(button);
 }
 function showTable(name) {
     currentTable = name;
     document.getElementById("message").textContent = "";
+    let data = loadData(name);
+    if (data == null) return;
     if (name == "products") {
-        fillTable(products,
+        fillTable(name, data,
             "Товари",
             ["id", "name", "category", "brand", "price", "stock", "warranty"],
             ["ID", "Назва", "Категорія", "Виробник", "Ціна, грн", "На складі, шт.", "Гарантія, міс."]
         );
     } else if (name == "customers") {
-        fillTable(customers,
+        fillTable(name, data,
             "Покупці",
             ["id", "fullName", "email", "city", "registrationDate", "type", "ordersCount"],
             ["ID", "ПІБ", "Електронна пошта", "Місто", "Дата реєстрації", "Тип покупця", "Кількість замовлень"]
         );
     } else if (name == "orders") {
-        fillTable(orders,
+        fillTable(name, data,
             "Замовлення",
             ["id", "customerId", "productId", "quantity", "date", "total", "status"],
             ["ID", "ID покупця", "ID товару", "Кількість, шт.", "Дата", "Сума, грн", "Статус"]
@@ -86,5 +89,4 @@ function showTable(name) {
 }
 
 
-loadData();
 showTable("products");
